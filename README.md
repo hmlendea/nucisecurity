@@ -5,3 +5,17 @@
 # About
 
 NuGet package for cryptography and authentication
+
+# Installation
+
+[![Get it from NuGet](https://raw.githubusercontent.com/hmlendea/nucisecurity/master/badges/stores/nuget.png)](https://nuget.org/packages/NuciSecurity)
+
+**.NET CLI**:
+```bash
+dotnet add package NuciSecurity
+```
+
+**Package Manager**:
+```powershell
+Install-Package NuciSecurity
+```
