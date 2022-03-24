@@ -30,7 +30,7 @@ namespace NuciSecurity.HMAC
 
             byte[] secretKey = Encoding.UTF8.GetBytes(signature);
 
-            using (HMACSHA256 hmac = new HMACSHA256(secretKey))
+            using (HMACSHA512 hmac = new HMACSHA512(secretKey))
             {
                 hmac.Initialize();
 
