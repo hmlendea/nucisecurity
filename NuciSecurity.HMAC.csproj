@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
     <RootNamespace>NuciSecurity.HMAC</RootNamespace>
     <Version>1.0.0</Version>
     <Description>HMAC Authentication</Description>
