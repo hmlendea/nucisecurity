@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>net6</TargetFramework>
     <RootNamespace>NuciSecurity.HMAC</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <Description>HMAC Authentication</Description>
     <Authors>Horațiu Mlendea</Authors>
-    <Copyright>Copyright 2019 © Horațiu Mlendea</Copyright>
+    <Copyright>Copyright 2022 © Horațiu Mlendea</Copyright>
     <RepositoryUrl>https://github.com/hmlendea/nucisecurity</RepositoryUrl>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <PackageTags>HMAC Authentication Security</PackageTags>
