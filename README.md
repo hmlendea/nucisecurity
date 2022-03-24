@@ -6,7 +6,7 @@ NuGet package for cryptography and authentication
 
 # Installation
 
-[![Get it from NuGet](https://raw.githubusercontent.com/hmlendea/readme-assets/master/badges/stores/nuget.png)](https://nuget.org/packages/NuciSecurity)
+[![Get it from NuGet](https://raw.githubusercontent.com/hmlendea/readme-assets/master/badges/stores/nuget.png)](https://nuget.org/packages/NuciSecurity.HMAC)
 
 **.NET CLI**:
 ```bash
