@@ -15,10 +15,7 @@ namespace NuciSecurity.HMAC
                 return false;
             }
 
-            string calculatedToken = GenerateToken(obj, sharedSecretKey);
-            bool doesMatch = calculatedToken.Equals(expectedToken);
-
-            return doesMatch;
+            return GenerateToken(obj, sharedSecretKey).Equals(expectedToken);
         }
 
         protected string ComputeHmacToken(string stringForSigning, string signature)
@@ -30,17 +27,13 @@ namespace NuciSecurity.HMAC
 
             byte[] secretKey = Encoding.UTF8.GetBytes(signature);
 
-            using (HMACSHA512 hmac = new HMACSHA512(secretKey))
-            {
-                hmac.Initialize();
+            using HMACSHA512 hmac = new(secretKey);
+            hmac.Initialize();
 
-                byte[] bytes = Encoding.UTF8.GetBytes(stringForSigning);
-                byte[] rawHmac = hmac.ComputeHash(bytes);
+            byte[] bytes = Encoding.UTF8.GetBytes(stringForSigning);
+            byte[] rawHmac = hmac.ComputeHash(bytes);
 
-                string base64hmac = Convert.ToBase64String(rawHmac);
-                
-                return base64hmac;
-            }
+            return Convert.ToBase64String(rawHmac);
         }
     }
 }
