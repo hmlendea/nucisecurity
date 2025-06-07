@@ -15,15 +15,16 @@ namespace NuciSecurity.HMAC
                 return false;
             }
 
+            ArgumentNullException.ThrowIfNull(obj);
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(sharedSecretKey);
+
             return GenerateToken(obj, sharedSecretKey).Equals(expectedToken);
         }
 
         protected string ComputeHmacToken(string stringForSigning, string signature)
         {
-            if (string.IsNullOrWhiteSpace(signature))
-            {
-                throw new ArgumentNullException("The signature cannot be null");
-            }
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(stringForSigning);
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(signature);
 
             byte[] secretKey = Encoding.UTF8.GetBytes(signature);
 
