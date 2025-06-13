@@ -1,14 +1,32 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace NuciSecurity.HMAC
 {
-    public abstract class HmacEncoder<T> : IHmacEncoder<T> where T : class
+    public class HmacEncoder
     {
-        public abstract string GenerateToken(T obj, string sharedSecretKey);
+        public static string GenerateToken<TObject>(TObject obj, string sharedSecretKey) where TObject : class
+        {
+            ArgumentNullException.ThrowIfNull(obj);
 
-        public bool IsTokenValid(string expectedToken, T obj, string sharedSecretKey)
+            StringBuilder stringBuilder = new();
+
+            var propertiesToCompute = obj.GetType()
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.GetCustomAttribute<HmacIgnoreAttribute>() is null);
+
+            foreach (PropertyInfo property in propertiesToCompute)
+            {
+                stringBuilder.Append(property.GetValue(obj)?.ToString() ?? string.Empty);
+            }
+
+            return ComputeHmacToken(stringBuilder.ToString(), sharedSecretKey);
+        }
+
+        public static bool IsTokenValid<TObject>(string expectedToken, TObject obj, string sharedSecretKey) where TObject : class
         {
             if (string.IsNullOrWhiteSpace(expectedToken))
             {
@@ -21,18 +39,15 @@ namespace NuciSecurity.HMAC
             return GenerateToken(obj, sharedSecretKey).Equals(expectedToken);
         }
 
-        protected string ComputeHmacToken(string stringForSigning, string signature)
+        static string ComputeHmacToken(string stringForSigning, string sharedSecretKey)
         {
             ArgumentNullException.ThrowIfNullOrWhiteSpace(stringForSigning);
-            ArgumentNullException.ThrowIfNullOrWhiteSpace(signature);
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(sharedSecretKey);
 
-            byte[] secretKey = Encoding.UTF8.GetBytes(signature);
-
-            using HMACSHA512 hmac = new(secretKey);
+            using HMACSHA512 hmac = new(Encoding.UTF8.GetBytes(sharedSecretKey));
             hmac.Initialize();
 
-            byte[] bytes = Encoding.UTF8.GetBytes(stringForSigning);
-            byte[] rawHmac = hmac.ComputeHash(bytes);
+            byte[] rawHmac = hmac.ComputeHash(Encoding.UTF8.GetBytes(stringForSigning));
 
             return Convert.ToBase64String(rawHmac);
         }
