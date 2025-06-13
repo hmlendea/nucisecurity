@@ -52,7 +52,7 @@ namespace NuciSecurity.HMAC
 
             string saltedString = $"{StaticSalt}.{stringForSigning}";
 
-            byte[] rawHmac = hmac.ComputeHash(Encoding.UTF8.GetBytes(stringForSigning));
+            byte[] rawHmac = hmac.ComputeHash(Encoding.UTF8.GetBytes(saltedString));
 
             return Convert.ToBase64String(rawHmac);
         }
