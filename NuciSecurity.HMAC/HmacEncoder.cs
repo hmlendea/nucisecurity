@@ -136,17 +136,30 @@ namespace NuciSecurity.HMAC
             hmac.Initialize();
 
             string saltedString = $"{StaticSalt}.{stringForSigning}";
-            byte[] bytesToSign = Encoding.UTF8.GetBytes(PadStringToAvoidBase64Equals(saltedString));
+            byte[] bytesToSign = Encoding.UTF8.GetBytes(saltedString);
+            byte[] keyBytes = PadBytesToAvoidBase64Equals(hmac.ComputeHash(bytesToSign));
 
-            return Convert.ToBase64String(hmac.ComputeHash(bytesToSign));
+            return Convert.ToBase64String(keyBytes);
         }
 
-        static string PadStringToAvoidBase64Equals(string input, char padChar = '~')
+        static byte[] PadBytesToAvoidBase64Equals(byte[] input, byte padByte = 0x00)
         {
-            var bytes = Encoding.UTF8.GetBytes(input);
-            int padLength = (3 - (bytes.Length % 3)) % 3;
+            int padLength = (3 - (input.Length % 3)) % 3;
 
-            return input + new string(padChar, padLength);
+            if (padLength.Equals(0))
+            {
+                return input;
+            }
+
+            byte[] padded = new byte[input.Length + padLength];
+            Buffer.BlockCopy(input, 0, padded, 0, input.Length);
+
+            for (int i = 0; i < padLength; i++)
+            {
+                padded[input.Length + i] = padByte;
+            }
+
+            return padded;
         }
 
         static string GetMd5Hash(string input)
