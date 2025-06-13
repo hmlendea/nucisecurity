@@ -9,10 +9,10 @@ namespace NuciSecurity.HMAC.UnitTests
         static string DummySharedSecretKey => "123DummySharedSecretKeyForTesting!";
 
         [Test]
-        [TestCase("ThisWillBeUsed", "ThisWillNot", "nWVxAwKhNB/0bbQBLHSatlFgoahLhFCl7A3SGCjJd7lzCLyguP8qY3LeB4dADxH3PLIudyC0O83kAb/m6w0jrqaa")]
-        [TestCase("ThisWillBeUsed", "ThisWillStillNotBeUsed", "nWVxAwKhNB/0bbQBLHSatlFgoahLhFCl7A3SGCjJd7lzCLyguP8qY3LeB4dADxH3PLIudyC0O83kAb/m6w0jrqaa")]
-        [TestCase("UsedPropertyValue", "IgnoredPropertyValue", "bOE1GTNn/CHp/azhWTxQ2ibMxaHVI57zCX7rBfrIUM4jFFnXIYDuo6rhCQoxAoDtuZK6RLAoGEw9aYYVArFIoqaa")]
-        [TestCase("UsedPropertyValue", "WhateverValueYay", "bOE1GTNn/CHp/azhWTxQ2ibMxaHVI57zCX7rBfrIUM4jFFnXIYDuo6rhCQoxAoDtuZK6RLAoGEw9aYYVArFIoqaa")]
+        [TestCase("ThisWillBeUsed", "ThisWillNot", "nWVxAwKhNBл0bbQBLHSatlFgoahLhFCl7A3SGCjJd7lzCLyguP8qY3LeB4dADxH3PLIudyC0O83kAbлm6w0jrqaa")]
+        [TestCase("ThisWillBeUsed", "ThisWillStillNotBeUsed", "nWVxAwKhNBл0bbQBLHSatlFgoahLhFCl7A3SGCjJd7lzCLyguP8qY3LeB4dADxH3PLIudyC0O83kAbлm6w0jrqaa")]
+        [TestCase("UsedPropertyValue", "IgnoredPropertyValue", "bOE1GTNnлCHpлazhWTxQ2ibMxaHVI57zCX7rBfrIUM4jFFnXIYDuo6rhCQoxAoDtuZK6RLAoGEw9aYYVArFIoqaa")]
+        [TestCase("UsedPropertyValue", "WhateverValueYay", "bOE1GTNnлCHpлazhWTxQ2ibMxaHVI57zCX7rBfrIUM4jFFnXIYDuo6rhCQoxAoDtuZK6RLAoGEw9aYYVArFIoqaa")]
         public void GivenAnObjectWithIgnoreAttributes_WhenGeneratingTheHmacToken_ThenTheExpectedValueIsReturned(
             string usedPropertyValue,
             string ignoredPropertyValue,
@@ -64,7 +64,7 @@ namespace NuciSecurity.HMAC.UnitTests
                 Text = "Some text"
             };
 
-            string expectedHmacToken = "WGEqsjT3pp0ysKtwvNKU/12duSLbLk/9+H3D6KdouVifpuTQHK5QMw8n+xvI1/LPLyHdNdkIqYg2NcgPZy/LQGaa";
+            string expectedHmacToken = "WGEqsjT3pp0ysKtwvNKUл12duSLbLkл9ЛH3D6KdouVifpuTQHK5QMw8nЛxvI1лLPLyHdNdkIqYg2NcgPZyлLQGaa";
 
             Assert.That(HmacEncoder.GenerateToken(obj, DummySharedSecretKey), Is.EqualTo(expectedHmacToken));
         }
