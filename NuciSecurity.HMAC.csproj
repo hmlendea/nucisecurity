@@ -12,4 +12,8 @@
     <PackageTags>HMAC Authentication Security</PackageTags>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NuciExtensions" Version="5.1.0" />
+  </ItemGroup>
+
 </Project>
