@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -13,7 +14,11 @@ namespace NuciSecurity.HMAC
 
             StringBuilder stringBuilder = new();
 
-            foreach (PropertyInfo property in obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            var propertiesToCompute = obj.GetType()
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.GetCustomAttribute<HmacIgnoreAttribute>() is null);
+
+            foreach (PropertyInfo property in propertiesToCompute)
             {
                 stringBuilder.Append(property.GetValue(obj)?.ToString() ?? string.Empty);
             }
