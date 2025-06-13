@@ -36,9 +36,15 @@ namespace NuciSecurity.HMAC
 
             foreach (PropertyInfo property in propertiesToCompute)
             {
-                string value = property.GetValue(obj)?.ToString() ?? EmptyValue;
-
+                var propertyValue = property.GetValue(obj);
                 int propertyOrder = property.GetCustomAttribute<HmacOrderAttribute>()?.Order ?? DefaultOrder;
+
+                string value = propertyValue switch
+                {
+                    DateTime dt => dt.ToString("O"),
+                    _ => propertyValue?.ToString() ?? EmptyValue
+                };
+
 
                 if ((propertyOrder % 2).Equals(0))
                 {
