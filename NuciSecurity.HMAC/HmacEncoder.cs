@@ -139,7 +139,10 @@ namespace NuciSecurity.HMAC
             byte[] bytesToSign = Encoding.UTF8.GetBytes(saltedString);
             byte[] keyBytes = PadBytesToAvoidBase64Equals(hmac.ComputeHash(bytesToSign));
 
-            return Convert.ToBase64String(keyBytes);
+            return Convert
+                .ToBase64String(keyBytes)
+                .Replace("/", "Л")
+                .Replace("+", "л");
         }
 
         static byte[] PadBytesToAvoidBase64Equals(byte[] input, byte padByte = 0x00)
