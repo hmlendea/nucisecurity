@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -20,6 +21,32 @@ namespace NuciSecurity.HMAC
         {
             ArgumentNullException.ThrowIfNull(obj);
 
+            string stringForSigning = GetStringForSigning(obj);
+            stringForSigning = string.Format(PrefixFormat, stringForSigning.Length) + stringForSigning;
+
+            return ComputeHmacToken(stringForSigning, sharedSecretKey);
+        }
+
+        public static bool IsTokenValid<TObject>(string expectedToken, TObject obj, string sharedSecretKey) where TObject : class
+        {
+            if (string.IsNullOrWhiteSpace(expectedToken))
+            {
+                return false;
+            }
+
+            ArgumentNullException.ThrowIfNull(obj);
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(sharedSecretKey);
+
+            return GenerateToken(obj, sharedSecretKey).Equals(expectedToken);
+        }
+
+        static string GetStringForSigning<TObject>(TObject obj) where TObject : class
+        {
+            if (obj is null)
+            {
+                return EmptyValue + FieldSeparator;
+            }
+
             StringBuilder stringBuilder = new();
 
             var propertiesToCompute = obj.GetType()
@@ -38,36 +65,52 @@ namespace NuciSecurity.HMAC
             {
                 var propertyValue = property.GetValue(obj);
                 int propertyOrder = property.GetCustomAttribute<HmacOrderAttribute>()?.Order ?? DefaultOrder;
+                string value;
 
-                string value = propertyValue switch
+                if (propertyValue is IEnumerable enumerable && propertyValue is not string)
                 {
-                    DateTime dt => dt.ToString("O"),
-                    _ => propertyValue?.ToString() ?? EmptyValue
-                };
+                    Type elementType = property.PropertyType.IsGenericType
+                        ? property.PropertyType.GetGenericArguments()[0]
+                        : property.PropertyType.GetElementType();
 
+                    if (elementType is not null && elementType.IsClass && elementType != typeof(string))
+                    {
+                        StringBuilder nestedBuilder = new();
+
+                        foreach (var item in enumerable)
+                        {
+                            nestedBuilder.Append(item is null ? EmptyValue : GetStringForSigning(item) + FieldSeparator);
+                        }
+
+                        value = nestedBuilder.ToString();
+                    }
+                    else
+                    {
+                        var flatValues = enumerable
+                            .Cast<object?>()
+                            .Select(item => item?.ToString() ?? EmptyValue);
+
+                        value = string.Join(FieldSeparator, flatValues);
+                    }
+                }
+                else
+                {
+                    value = propertyValue switch
+                    {
+                        DateTime dt => dt.ToString("O"),
+                        _ => propertyValue?.ToString() ?? EmptyValue
+                    };
+                }
 
                 if ((propertyOrder % 2).Equals(0))
                 {
                     value = value.Reverse();
                 }
 
-                stringBuilder.Append(string.Format(PrefixFormat, value.Length) + value + FieldSeparator);
+                stringBuilder.Append(value + FieldSeparator);
             }
 
-            return ComputeHmacToken(stringBuilder.ToString(), sharedSecretKey);
-        }
-
-        public static bool IsTokenValid<TObject>(string expectedToken, TObject obj, string sharedSecretKey) where TObject : class
-        {
-            if (string.IsNullOrWhiteSpace(expectedToken))
-            {
-                return false;
-            }
-
-            ArgumentNullException.ThrowIfNull(obj);
-            ArgumentNullException.ThrowIfNullOrWhiteSpace(sharedSecretKey);
-
-            return GenerateToken(obj, sharedSecretKey).Equals(expectedToken);
+            return stringBuilder.ToString();
         }
 
         static string ComputeHmacToken(string stringForSigning, string sharedSecretKey)
