@@ -8,6 +8,9 @@ namespace NuciSecurity.HMAC
 {
     public class HmacEncoder
     {
+        private static string StaticSalt => $"{nameof(NuciSecurity)}.{nameof(HMAC)}.{nameof(StaticSalt)}.8fc5307e-c10b-40d0-b710-de79e7954358";
+        private static string FieldSeparator => "|#FieldSeparator#|";
+
         public static string GenerateToken<TObject>(TObject obj, string sharedSecretKey) where TObject : class
         {
             ArgumentNullException.ThrowIfNull(obj);
@@ -20,7 +23,7 @@ namespace NuciSecurity.HMAC
 
             foreach (PropertyInfo property in propertiesToCompute)
             {
-                stringBuilder.Append(property.GetValue(obj)?.ToString() ?? string.Empty);
+                stringBuilder.Append(property.GetValue(obj)?.ToString() ?? string.Empty + FieldSeparator);
             }
 
             return ComputeHmacToken(stringBuilder.ToString(), sharedSecretKey);
@@ -47,7 +50,9 @@ namespace NuciSecurity.HMAC
             using HMACSHA512 hmac = new(Encoding.UTF8.GetBytes(sharedSecretKey));
             hmac.Initialize();
 
-            byte[] rawHmac = hmac.ComputeHash(Encoding.UTF8.GetBytes(stringForSigning));
+            string saltedString = $"{StaticSalt}.{stringForSigning}";
+
+            byte[] rawHmac = hmac.ComputeHash(Encoding.UTF8.GetBytes(saltedString));
 
             return Convert.ToBase64String(rawHmac);
         }
