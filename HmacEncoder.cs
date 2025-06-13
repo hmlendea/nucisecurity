@@ -30,7 +30,10 @@ namespace NuciSecurity.HMAC
             ArgumentNullException.ThrowIfNull(obj);
 
             string stringForSigning = GetStringForSigning(obj);
-            string prefix = string.Format(PrefixFormat, stringForSigning.Length, stringForSigning.GetHashCode());
+            string prefix = string.Format(
+                PrefixFormat,
+                stringForSigning.Length,
+                GetMd5Hash(stringForSigning));
 
             return ComputeHmacToken(prefix + stringForSigning.Reverse(), sharedSecretKey).InvertCase();
         }
@@ -144,6 +147,20 @@ namespace NuciSecurity.HMAC
             int padLength = (3 - (bytes.Length % 3)) % 3;
 
             return input + new string(padChar, padLength);
+        }
+
+        static string GetMd5Hash(string input)
+        {
+            byte[] hashBytes = MD5.HashData(Encoding.UTF8.GetBytes(input));
+
+            StringBuilder sb = new();
+
+            foreach (byte b in hashBytes)
+            {
+                sb.Append(b.ToString("x2"));
+            }
+
+            return sb.ToString();
         }
     }
 }
