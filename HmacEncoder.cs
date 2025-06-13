@@ -17,6 +17,14 @@ namespace NuciSecurity.HMAC
         private static string PrefixFormat => "|#Length:{0};Checksum:{1}#|";
         private static int DefaultOrder => int.MaxValue;
 
+        /// <summary>
+        /// Generates a HMAC token for the given object using the specified shared secret key.
+        /// </summary>
+        /// <typeparam name="TObject">The type of the object to generate the token for.</typeparam>
+        /// <param name="obj">The object to generate the token for.</param>
+        /// <param name="sharedSecretKey">The shared secret key used for HMAC generation.</param>
+        /// <returns>An HMAC token as a Base64 encoded string.</returns>
+        /// <throws cref="ArgumentNullException">Thrown if the object or shared secret key is null.</throws>
         public static string GenerateToken<TObject>(TObject obj, string sharedSecretKey) where TObject : class
         {
             ArgumentNullException.ThrowIfNull(obj);
@@ -27,6 +35,15 @@ namespace NuciSecurity.HMAC
             return ComputeHmacToken(prefix + stringForSigning.Reverse(), sharedSecretKey).InvertCase();
         }
 
+        /// <summary>
+        /// Validates if the provided token matches the generated token for the given object and shared secret key.
+        /// </summary>
+        /// <typeparam name="TObject">The type of the object to validate against.</typeparam>
+        /// <param name="expectedToken">The expected HMAC token to validate.</param>
+        /// <param name="obj">The object to validate against.</param>
+        /// <param name="sharedSecretKey">The shared secret key used for HMAC generation.</param>
+        /// <returns>True if the token is valid, otherwise false.</returns>
+        /// <throws cref="ArgumentNullException">Thrown if the object or shared secret key is null.</throws>
         public static bool IsTokenValid<TObject>(string expectedToken, TObject obj, string sharedSecretKey) where TObject : class
         {
             if (string.IsNullOrWhiteSpace(expectedToken))
