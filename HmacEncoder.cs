@@ -24,7 +24,7 @@ namespace NuciSecurity.HMAC
             string stringForSigning = GetStringForSigning(obj);
             string prefix = string.Format(PrefixFormat, stringForSigning.Length, stringForSigning.GetHashCode());
 
-            return ComputeHmacToken(prefix + stringForSigning.Reverse(), sharedSecretKey);
+            return ComputeHmacToken(prefix + stringForSigning.Reverse(), sharedSecretKey).InvertCase();
         }
 
         public static bool IsTokenValid<TObject>(string expectedToken, TObject obj, string sharedSecretKey) where TObject : class
