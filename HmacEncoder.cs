@@ -19,7 +19,15 @@ namespace NuciSecurity.HMAC
 
             var propertiesToCompute = obj.GetType()
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.GetCustomAttribute<HmacIgnoreAttribute>() is null);
+                .Where(p => p.GetCustomAttribute<HmacIgnoreAttribute>() is null)
+                .Select(p => new
+                {
+                    Property = p,
+                    OrderAttr = p.GetCustomAttribute<HmacOrderAttribute>()
+                })
+                .OrderBy(x => x.OrderAttr?.Order ?? int.MaxValue)
+                .ThenBy(x => x.Property.Name)
+                .Select(x => x.Property);
 
             foreach (PropertyInfo property in propertiesToCompute)
             {
