@@ -4,12 +4,15 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
+using NuciExtensions;
+
 namespace NuciSecurity.HMAC
 {
     public class HmacEncoder
     {
         private static string StaticSalt => $"{nameof(NuciSecurity)}.{nameof(HMAC)}.{nameof(StaticSalt)}.8fc5307e-c10b-40d0-b710-de79e7954358";
         private static string FieldSeparator => "|#FieldSeparator#|";
+        private static string EmptyValue => "#EmptyValue#";
 
         public static string GenerateToken<TObject>(TObject obj, string sharedSecretKey) where TObject : class
         {
@@ -31,7 +34,16 @@ namespace NuciSecurity.HMAC
 
             foreach (PropertyInfo property in propertiesToCompute)
             {
-                stringBuilder.Append(property.GetValue(obj)?.ToString() ?? string.Empty + FieldSeparator);
+                string value = property.GetValue(obj)?.ToString() ?? EmptyValue;
+
+                int propertyOrder = property.GetCustomAttribute<HmacOrderAttribute>()?.Order ?? int.MaxValue;
+
+                if ((propertyOrder % 2).Equals(0))
+                {
+                    value = value.Reverse();
+                }
+
+                stringBuilder.Append(value + FieldSeparator);
             }
 
             return ComputeHmacToken(stringBuilder.ToString(), sharedSecretKey);
