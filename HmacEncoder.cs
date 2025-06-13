@@ -12,7 +12,9 @@ namespace NuciSecurity.HMAC
     {
         private static string StaticSalt => $"{nameof(NuciSecurity)}.{nameof(HMAC)}.{nameof(StaticSalt)}.8fc5307e-c10b-40d0-b710-de79e7954358";
         private static string FieldSeparator => "|#FieldSeparator#|";
-        private static string EmptyValue => "#EmptyValue#";
+        private static string EmptyValue => "|#EmptyValue#|";
+        private static string PrefixFormat => "|#Length:{0}#|";
+        private static int DefaultOrder => int.MaxValue;
 
         public static string GenerateToken<TObject>(TObject obj, string sharedSecretKey) where TObject : class
         {
@@ -28,7 +30,7 @@ namespace NuciSecurity.HMAC
                     Property = p,
                     OrderAttr = p.GetCustomAttribute<HmacOrderAttribute>()
                 })
-                .OrderBy(x => x.OrderAttr?.Order ?? int.MaxValue)
+                .OrderBy(x => x.OrderAttr?.Order ?? DefaultOrder)
                 .ThenBy(x => x.Property.Name)
                 .Select(x => x.Property);
 
@@ -36,14 +38,14 @@ namespace NuciSecurity.HMAC
             {
                 string value = property.GetValue(obj)?.ToString() ?? EmptyValue;
 
-                int propertyOrder = property.GetCustomAttribute<HmacOrderAttribute>()?.Order ?? int.MaxValue;
+                int propertyOrder = property.GetCustomAttribute<HmacOrderAttribute>()?.Order ?? DefaultOrder;
 
                 if ((propertyOrder % 2).Equals(0))
                 {
                     value = value.Reverse();
                 }
 
-                stringBuilder.Append(value + FieldSeparator);
+                stringBuilder.Append(string.Format(PrefixFormat, value.Length) + value + FieldSeparator);
             }
 
             return ComputeHmacToken(stringBuilder.ToString(), sharedSecretKey);
