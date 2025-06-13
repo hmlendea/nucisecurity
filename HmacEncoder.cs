@@ -14,7 +14,7 @@ namespace NuciSecurity.HMAC
         private static string StaticSalt => $"{nameof(NuciSecurity)}.{nameof(HMAC)}.{nameof(StaticSalt)}.8fc5307e-c10b-40d0-b710-de79e7954358";
         private static string FieldSeparator => "|#FieldSeparator#|";
         private static string EmptyValue => "|#EmptyValue#|";
-        private static string PrefixFormat => "|#Length:{0}#|";
+        private static string PrefixFormat => "|#Length:{0};Checksum:{1}#|";
         private static int DefaultOrder => int.MaxValue;
 
         public static string GenerateToken<TObject>(TObject obj, string sharedSecretKey) where TObject : class
@@ -22,9 +22,9 @@ namespace NuciSecurity.HMAC
             ArgumentNullException.ThrowIfNull(obj);
 
             string stringForSigning = GetStringForSigning(obj);
-            stringForSigning = string.Format(PrefixFormat, stringForSigning.Length) + stringForSigning.Reverse();
+            string prefix = string.Format(PrefixFormat, stringForSigning.Length, stringForSigning.GetHashCode());
 
-            return ComputeHmacToken(stringForSigning, sharedSecretKey);
+            return ComputeHmacToken(prefix + stringForSigning.Reverse(), sharedSecretKey);
         }
 
         public static bool IsTokenValid<TObject>(string expectedToken, TObject obj, string sharedSecretKey) where TObject : class
@@ -64,7 +64,6 @@ namespace NuciSecurity.HMAC
             foreach (PropertyInfo property in propertiesToCompute)
             {
                 var propertyValue = property.GetValue(obj);
-                int propertyOrder = property.GetCustomAttribute<HmacOrderAttribute>()?.Order ?? DefaultOrder;
                 string value;
 
                 if (propertyValue is IEnumerable enumerable && propertyValue is not string)
