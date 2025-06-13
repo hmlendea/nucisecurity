@@ -22,7 +22,7 @@ namespace NuciSecurity.HMAC
             ArgumentNullException.ThrowIfNull(obj);
 
             string stringForSigning = GetStringForSigning(obj);
-            stringForSigning = string.Format(PrefixFormat, stringForSigning.Length) + stringForSigning;
+            stringForSigning = string.Format(PrefixFormat, stringForSigning.Length) + stringForSigning.Reverse();
 
             return ComputeHmacToken(stringForSigning, sharedSecretKey);
         }
@@ -100,11 +100,6 @@ namespace NuciSecurity.HMAC
                         DateTime dt => dt.ToString("O"),
                         _ => propertyValue?.ToString() ?? EmptyValue
                     };
-                }
-
-                if ((propertyOrder % 2).Equals(0))
-                {
-                    value = value.Reverse();
                 }
 
                 stringBuilder.Append(value + FieldSeparator);
