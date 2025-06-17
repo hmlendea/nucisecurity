@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>NuciSecurity.HMAC</RootNamespace>
-    <Version>4.1.0</Version>
+    <Version>4.1.1</Version>
     <Description>HMAC Authentication</Description>
     <Authors>Horațiu Mlendea</Authors>
     <Copyright>Copyright 2025 © Horațiu Mlendea</Copyright>
