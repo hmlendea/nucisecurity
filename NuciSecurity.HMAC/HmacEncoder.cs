@@ -47,6 +47,7 @@ namespace NuciSecurity.HMAC
         /// <param name="sharedSecretKey">The shared secret key used for HMAC generation.</param>
         /// <returns>True if the token is valid, otherwise false.</returns>
         /// <throws cref="ArgumentNullException">Thrown if the object or shared secret key is null.</throws>
+        [Obsolete($"Use HmacValidator.IsTokenValid instead.")]
         public static bool IsTokenValid<TObject>(string expectedToken, TObject obj, string sharedSecretKey) where TObject : class
             => HmacValidator.IsTokenValid(expectedToken, obj, sharedSecretKey);
 
