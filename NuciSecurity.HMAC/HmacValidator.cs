@@ -15,7 +15,7 @@ namespace NuciSecurity.HMAC
         /// <exception cref="SecurityException">Thrown if the token is not valid.</exception>
         public static void Validate<TObject>(string expectedToken, TObject obj, string sharedSecretKey) where TObject : class
         {
-            if (!HmacEncoder.IsTokenValid(expectedToken, obj, sharedSecretKey))
+            if (!IsTokenValid(expectedToken, obj, sharedSecretKey))
             {
                 throw new SecurityException("The HMAC token is not valid.");
             }
