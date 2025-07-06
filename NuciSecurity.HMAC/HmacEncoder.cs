@@ -108,6 +108,7 @@ namespace NuciSecurity.HMAC
                     value = propertyValue switch
                     {
                         DateTime dt => dt.ToString("O"),
+                        bool b => b.ToString().ToLowerInvariant(),
                         _ => propertyValue?.ToString() ?? EmptyValue
                     };
                 }
